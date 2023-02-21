@@ -4,37 +4,50 @@ const countriesElem = document.querySelector('.countries');
 const dropDown = document.querySelector('.drop-down');
 const dropElem = document.querySelector('.drop');
 const region = document.querySelectorAll('.drop-text');
-const search = document.querySelector('.search');
+const searchInput = document.querySelector('.search');
+const searchBtn = document.querySelector('.click');
 const toggle = document.querySelector('.toggle');
 
-//getting an array
+//first request
 
-async function getCountry() {
-  const url = await fetch('https://restcountries.com/v3.1/all');
-  const res = await url.json();
-  console.log(res);
-  res.forEach(element => {
-    showCountry(element)
+fetch('https://restcountries.com/v3.1/all')
+.then(response => response.json())
+.then(data => displayCountries(data));
+
+searchBtn.addEventListener('click', () => {
+  let countryName = searchInput.value;
+  const url = Boolean(countryName.trim())
+  ? `https://restcountries.com/v3.1/name/${countryName}`
+  : 'https://restcountries.com/v3.1/all';
+  fetch(url)
+    .then(response => response.json())
+    .then(data => displayCountries(data));
+});
+
+//keypress
+
+searchInput.addEventListener('keypress', (e) => {
+  if(e.keyCode === 13) {
+    searchBtn.click();
+  }
+})
+
+const displayCountries = (data) => {
+  countriesElem.innerHTML = '';
+  data.forEach(country => {
+    const div = document.createElement('div');
+    div.className = 'country';
+    div.innerHTML = `<div class="country-img">
+       <img class="img" src="${country.flags.png}" alt="">
+     </div>
+     <div class="country-info">
+       <h2 class="country-title">${country.name.common}:</h2>
+       <p class="country-text"><strong>Population:</strong> ${country.population}</p>
+       <p class="country-text country-region"><strong>Region:</strong> ${country.region}</p>
+       <p class="country-text"><strong>Capital:</strong> ${country.capital}</p>
+     </div>`;
+    countriesElem.appendChild(div);
   })
-}
-
-getCountry()
-
-//render
-
-function showCountry(data) {
-  const country = document.createElement('div');
-  country.classList.add('country');
-  country.innerHTML = `<div class="country-img">
-  <img class="img" src="${data.flags.png}" alt="">
-</div>
-<div class="country-info">
-  <h2 class="country-title">${data.name.common}:</h2>
-  <p class="country-text"><strong>Population:</strong> ${data.population}</p>
-  <p class="country-text country-region"><strong>Region:</strong> ${data.region}</p>
-  <p class="country-text"><strong>Capital:</strong> ${data.capital}</p>
-</div>`
-  countriesElem.appendChild(country);
 }
 
 dropDown.addEventListener('click', () => {
@@ -60,20 +73,7 @@ region.forEach(element => {
   })
 })
 
-//search
-
-search.addEventListener('input', () => {
-  console.log(search.value.toLowerCase());
-  Array.from(countryName).forEach(elem => {
-    if (elem.innerText.toLowerCase().includes(search.value.toLowerCase())) {
-      elem.parentElement.parentElement.style.display = 'grid';
-    } else {
-      elem.parentElement.parentElement.style.display = 'none';
-    }
-  });
-});
-
-//dark mode
+// dark mode
 
 toggle.addEventListener('click', () => {
   document.body.classList.toggle('dark');
