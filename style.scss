@@ -38,6 +38,16 @@ button {
   box-shadow: 0 0 5px rgba(0,0,0,0.3);
   position: relative;
   border-radius: 5px
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.click {
+  background-color: rgba(63, 63, 128, 0.996);
+  color: white;
+  width: 100px;
+  border-radius: 5px;
 }
 
 .search {
